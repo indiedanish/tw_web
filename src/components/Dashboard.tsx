@@ -6,7 +6,8 @@ import { LocationTable } from './LocationTable';
 import { Charts } from './Charts';
 import { Map } from './Map';
 import { AnalyticsCards } from './AnalyticsCards';
-import { MapPin, RefreshCw, FileBarChart, BarChart3, Table, Map as MapIcon, LogOut } from 'lucide-react';
+import { LocationDataAccordion } from './LocationDataAccordion';
+import { MapPin, RefreshCw, FileBarChart, BarChart3, Table, Map as MapIcon, LogOut, List } from 'lucide-react';
 
 export const Dashboard = () => {
   const {
@@ -19,7 +20,7 @@ export const Dashboard = () => {
   } = useLocationData();
   const { logout } = useAuth();
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [currentView, setCurrentView] = useState<'table' | 'charts' | 'map'>('table');
+  const [currentView, setCurrentView] = useState<'table' | 'charts' | 'map' | 'accordion'>('table');
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -39,9 +40,9 @@ export const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-      <div className="container mx-auto px-4 py-8">
-        <header className="mb-8">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
             <div className="flex items-center">
               <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-3 rounded-xl mr-4 shadow-lg">
                 <MapPin className="h-8 w-8 text-white" />
@@ -64,6 +65,16 @@ export const Dashboard = () => {
                   Table
                 </button>
                 <button
+                  onClick={() => setCurrentView('accordion')}
+                  className={`flex items-center gap-2 px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200 ${currentView === 'accordion'
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                >
+                  <List className="h-4 w-4" />
+                  Details
+                </button>
+                <button
                   onClick={() => setCurrentView('charts')}
                   className={`flex items-center gap-2 px-3 py-1 rounded-md text-sm font-medium transition-colors duration-200 ${currentView === 'charts'
                     ? 'bg-blue-600 text-white'
@@ -73,7 +84,6 @@ export const Dashboard = () => {
                   <BarChart3 className="h-4 w-4" />
                   Charts
                 </button>
-
               </div>
               <button
                 onClick={handleRefresh}
@@ -96,8 +106,10 @@ export const Dashboard = () => {
           </div>
 
           <Filters />
-        </header>
+        </div>
+      </header>
 
+      <div className="container mx-auto px-4 pt-[1000px] md:pt-[450px] lg:pt-[400px] xl:pt-[350px] pb-8">
         {error ? (
           <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-8 rounded-md" role="alert">
             <p className="font-bold">Error</p>
@@ -117,11 +129,17 @@ export const Dashboard = () => {
               </div>
               <LocationTable />
             </div>
+          ) : currentView === 'accordion' ? (
+            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+              <div className="p-6">
+                <LocationDataAccordion />
+              </div>
+            </div>
           ) : currentView === 'charts' ? (
             <Charts />
           ) : (
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
-
+              {/* Map view placeholder */}
             </div>
           )}
         </div>
