@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useLocationData } from '../contexts/LocationDataContext';
+import { useAuth } from '../contexts/AuthContext';
 import { Filters } from './Filters';
 import { LocationTable } from './LocationTable';
 import { Charts } from './Charts';
 import { Map } from './Map';
 import { AnalyticsCards } from './AnalyticsCards';
-import { MapPin, RefreshCw, FileBarChart, BarChart3, Table, Map as MapIcon } from 'lucide-react';
+import { MapPin, RefreshCw, FileBarChart, BarChart3, Table, Map as MapIcon, LogOut } from 'lucide-react';
 
 export const Dashboard = () => {
   const {
@@ -16,6 +17,7 @@ export const Dashboard = () => {
     selectedLocation,
     setSelectedLocation
   } = useLocationData();
+  const { logout } = useAuth();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [currentView, setCurrentView] = useState<'table' | 'charts' | 'map'>('table');
 
@@ -23,6 +25,10 @@ export const Dashboard = () => {
     setIsRefreshing(true);
     await refreshData();
     setTimeout(() => setIsRefreshing(false), 500);
+  };
+
+  const handleLogout = () => {
+    logout();
   };
 
   useEffect(() => {
@@ -67,7 +73,7 @@ export const Dashboard = () => {
                   <BarChart3 className="h-4 w-4" />
                   Charts
                 </button>
-            
+
               </div>
               <button
                 onClick={handleRefresh}
@@ -77,9 +83,14 @@ export const Dashboard = () => {
                 <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
                 Refresh
               </button>
-              <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 rounded-lg text-white hover:bg-blue-700 transition-colors duration-200">
-                <FileBarChart className="h-4 w-4" />
-                Export
+
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 px-4 py-2 bg-red-600 rounded-lg text-white hover:bg-red-700 transition-colors duration-200"
+                title="Logout"
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
               </button>
             </div>
           </div>
@@ -110,7 +121,7 @@ export const Dashboard = () => {
             <Charts />
           ) : (
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
-       
+
             </div>
           )}
         </div>
