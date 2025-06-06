@@ -34,7 +34,7 @@ export const Charts = () => {
     // Speed over time chart data
     const speedChartData = {
         labels: filteredData.map(item =>
-            format(new Date(parseInt(item.time)), 'HH:mm:ss')
+            format(new Date(parseInt(item.createdAt)), 'HH:mm:ss')
         ),
         datasets: [
             {

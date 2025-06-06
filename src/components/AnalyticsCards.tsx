@@ -26,7 +26,7 @@ export const AnalyticsCards = () => {
     const avgAccuracy = Math.round(filteredData.reduce((sum, item) => sum + item.accuracy, 0) / filteredData.length);
 
     // Time range analysis
-    const timestamps = filteredData.map(item => parseInt(item.time));
+    const timestamps = filteredData.map(item => parseInt(item.createdAt));
     const earliestTime = Math.min(...timestamps);
     const latestTime = Math.max(...timestamps);
     const timeSpan = differenceInHours(latestTime, earliestTime);

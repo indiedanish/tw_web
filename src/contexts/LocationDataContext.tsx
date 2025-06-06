@@ -73,7 +73,7 @@ export const LocationDataProvider = ({ children }: { children: ReactNode }) => {
     // Filter by date range
     if (filters.startDate) {
       filtered = filtered.filter(location => {
-        const locationDate = new Date(parseInt(location.time));
+        const locationDate = new Date(parseInt(location.createdAt));
         return locationDate >= filters.startDate!;
       });
     }
@@ -84,7 +84,7 @@ export const LocationDataProvider = ({ children }: { children: ReactNode }) => {
       endDate.setHours(23, 59, 59, 999);
       
       filtered = filtered.filter(location => {
-        const locationDate = new Date(parseInt(location.time));
+        const locationDate = new Date(parseInt(location.createdAt));
         return locationDate <= endDate;
       });
     }

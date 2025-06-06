@@ -138,7 +138,7 @@ const AccordionItem: React.FC<AccordionItemProps> = ({ location, isOpen, onToggl
                                 </span>
                                 <span className="flex items-center">
                                     <Clock className="h-4 w-4 mr-1" />
-                                    {formatDate(location.time)}
+                                    {formatDate(location.createdAt)}
                                 </span>
                                 <span className="flex items-center">
                                     <Gauge className="h-4 w-4 mr-1" />
