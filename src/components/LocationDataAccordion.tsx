@@ -99,7 +99,7 @@ const AccordionItem: React.FC<AccordionItemProps> = ({ location, isOpen, onToggl
             color: "bg-orange-500",
             fields: [
                 { label: "Device Time", value: location.deviceRDT, icon: Clock },
-                { label: "Server Time", value: formatDate(location.time), icon: Clock },
+                { label: "Server Time", value: format(new Date(location.createdAt), 'dd/MM/yyyy HH:mm:ss'), icon: Clock },
                 { label: "GMT Settings", value: location.gmtSettings, icon: Globe },
                 { label: "Created At", value: formatCreatedDate(location.createdAt), icon: Calendar },
                 { label: "Updated At", value: formatCreatedDate(location.updatedAt), icon: Calendar },

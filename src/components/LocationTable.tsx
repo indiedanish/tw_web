@@ -62,11 +62,10 @@ export const LocationTable = () => {
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {filteredData.map((location) => (
-            <tr 
-              key={location.id} 
-              className={`hover:bg-blue-50 cursor-pointer transition-colors duration-150 ${
-                selectedLocation?.id === location.id ? 'bg-blue-50' : ''
-              }`}
+            <tr
+              key={location.id}
+              className={`hover:bg-blue-50 cursor-pointer transition-colors duration-150 ${selectedLocation?.id === location.id ? 'bg-blue-50' : ''
+                }`}
               onClick={() => handleRowClick(location)}
             >
               <td className="px-6 py-4 whitespace-nowrap">
@@ -91,7 +90,7 @@ export const LocationTable = () => {
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex items-center">
                   <Clock className="h-4 w-4 text-gray-500 mr-1" />
-                  <div className="text-sm text-gray-500">{formatDate(location.time)}</div>
+                  <div className="text-sm text-gray-500">{format(new Date(location.createdAt), 'dd/MM/yyyy HH:mm:ss')}</div>
                 </div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
