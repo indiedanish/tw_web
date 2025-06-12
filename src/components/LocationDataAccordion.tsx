@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { useLocationData } from '../contexts/LocationDataContext';
 import { LocationData } from '../types';
+import { Pagination } from './Pagination';
 
 interface AccordionItemProps {
     location: LocationData;
@@ -33,7 +34,7 @@ const AccordionItem: React.FC<AccordionItemProps> = ({ location, isOpen, onToggl
     const formatDate = (timestamp: string) => {
         try {
             return format(new Date(parseInt(timestamp)), 'dd/MM/yyyy HH:mm:ss');
-        } catch (e) {
+        } catch {
             return 'Invalid Date';
         }
     };
@@ -41,7 +42,7 @@ const AccordionItem: React.FC<AccordionItemProps> = ({ location, isOpen, onToggl
     const formatCreatedDate = (dateString: string) => {
         try {
             return format(new Date(dateString), 'dd/MM/yyyy HH:mm:ss');
-        } catch (e) {
+        } catch {
             return 'Invalid Date';
         }
     };
@@ -60,11 +61,11 @@ const AccordionItem: React.FC<AccordionItemProps> = ({ location, isOpen, onToggl
             icon: Smartphone,
             color: "bg-blue-500",
             fields: [
-                { label: "Device Name", value: location.name, icon: Smartphone },
-                { label: "IMEI", value: location.imei, icon: Database },
-                { label: "Phone Number", value: location.phoneNo, icon: Phone },
-                { label: "Email Address", value: location.emailAddress, icon: Mail },
-                { label: "Version", value: location.versionNo, icon: Settings },
+                { label: "Device Name", value: location.name || 'N/A', icon: Smartphone },
+                { label: "IMEI", value: location.imei || 'N/A', icon: Database },
+                { label: "Phone Number", value: location.phoneNo || 'N/A', icon: Phone },
+                { label: "Email Address", value: location.emailAddress || 'N/A', icon: Mail },
+                { label: "Version", value: location.versionNo || 'N/A', icon: Settings },
             ]
         },
         {
@@ -72,11 +73,11 @@ const AccordionItem: React.FC<AccordionItemProps> = ({ location, isOpen, onToggl
             icon: MapPin,
             color: "bg-green-500",
             fields: [
-                { label: "Latitude", value: location.latitude.toFixed(6), icon: MapPin },
-                { label: "Longitude", value: location.longitude.toFixed(6), icon: MapPin },
-                { label: "Altitude", value: `${location.altitude}m`, icon: Mountain },
-                { label: "Accuracy", value: `${location.accuracy}m`, icon: Target },
-                { label: "Provider", value: location.provider, icon: Globe },
+                { label: "Latitude", value: location.latitude?.toFixed(6) || 'N/A', icon: MapPin },
+                { label: "Longitude", value: location.longitude?.toFixed(6) || 'N/A', icon: MapPin },
+                { label: "Altitude", value: location.altitude ? `${location.altitude}m` : 'N/A', icon: Mountain },
+                { label: "Accuracy", value: location.accuracy ? `${location.accuracy}m` : 'N/A', icon: Target },
+                { label: "Provider", value: location.provider || 'N/A', icon: Globe },
             ]
         },
         {
@@ -84,12 +85,12 @@ const AccordionItem: React.FC<AccordionItemProps> = ({ location, isOpen, onToggl
             icon: Navigation,
             color: "bg-purple-500",
             fields: [
-                { label: "Speed", value: `${location.speed} km/h`, icon: Gauge },
-                { label: "Bearing", value: `${location.bearing}°`, icon: Compass },
-                { label: "Reason", value: location.reason, icon: Activity },
+                { label: "Speed", value: location.speed ? `${location.speed} km/h` : 'N/A', icon: Gauge },
+                { label: "Bearing", value: location.bearing ? `${location.bearing}°` : 'N/A', icon: Compass },
+                { label: "Reason", value: location.reason || 'N/A', icon: Activity },
                 {
-                    label: "Ignition Status", value: getIgStatusText(location.igStatus), icon: Zap,
-                    valueClass: getIgStatusColor(location.igStatus)
+                    label: "Ignition Status", value: location.igStatus !== null ? getIgStatusText(location.igStatus) : 'N/A', icon: Zap,
+                    valueClass: location.igStatus !== null ? getIgStatusColor(location.igStatus) : ''
                 },
             ]
         },
@@ -98,11 +99,11 @@ const AccordionItem: React.FC<AccordionItemProps> = ({ location, isOpen, onToggl
             icon: Clock,
             color: "bg-orange-500",
             fields: [
-                { label: "Device Time", value: location.deviceRDT, icon: Clock },
-                { label: "Server Time", value: format(new Date(location.createdAt), 'dd/MM/yyyy HH:mm:ss'), icon: Clock },
-                { label: "GMT Settings", value: location.gmtSettings, icon: Globe },
-                { label: "Created At", value: formatCreatedDate(location.createdAt), icon: Calendar },
-                { label: "Updated At", value: formatCreatedDate(location.updatedAt), icon: Calendar },
+                { label: "Device Time", value: location.deviceRDT || 'N/A', icon: Clock },
+                { label: "Server Time", value: location.createdAt ? format(new Date(location.createdAt), 'dd/MM/yyyy HH:mm:ss') : 'N/A', icon: Clock },
+                { label: "GMT Settings", value: location.gmtSettings || 'N/A', icon: Globe },
+                { label: "Created At", value: location.createdAt ? formatCreatedDate(location.createdAt) : 'N/A', icon: Calendar },
+                { label: "Updated At", value: location.updatedAt ? formatCreatedDate(location.updatedAt) : 'N/A', icon: Calendar },
             ]
         },
         {
@@ -110,9 +111,9 @@ const AccordionItem: React.FC<AccordionItemProps> = ({ location, isOpen, onToggl
             icon: Database,
             color: "bg-gray-500",
             fields: [
-                { label: "Location ID", value: location.id.toString(), icon: Database },
-                { label: "Device ID", value: location.deviceId.toString(), icon: Database },
-                { label: "Local Primary ID", value: location.localPrimaryId.toString(), icon: Database },
+                { label: "Location ID", value: location.id?.toString() || 'N/A', icon: Database },
+                { label: "Device ID", value: location.deviceId?.toString() || 'N/A', icon: Database },
+                { label: "Local Primary ID", value: location.localPrimaryId?.toString() || 'N/A', icon: Database },
             ]
         }
     ];
@@ -130,22 +131,22 @@ const AccordionItem: React.FC<AccordionItemProps> = ({ location, isOpen, onToggl
                             <Activity className="h-5 w-5 text-blue-600" />
                         </div>
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-800">{location.name}</h3>
+                            <h3 className="text-lg font-semibold text-gray-800">{location.name || 'Unknown Device'}</h3>
                             <div className="flex items-center space-x-4 text-sm text-gray-600 mt-1">
                                 <span className="flex items-center">
                                     <MapPin className="h-4 w-4 mr-1" />
-                                    {location.latitude.toFixed(6)}, {location.longitude.toFixed(6)}
+                                    {location.latitude?.toFixed(6) || 'N/A'}, {location.longitude?.toFixed(6) || 'N/A'}
                                 </span>
                                 <span className="flex items-center">
                                     <Clock className="h-4 w-4 mr-1" />
-                                    {formatDate(location.createdAt)}
+                                    {location.createdAt ? formatDate(location.createdAt) : 'N/A'}
                                 </span>
                                 <span className="flex items-center">
                                     <Gauge className="h-4 w-4 mr-1" />
-                                    {location.speed} km/h
+                                    {location.speed || 'N/A'} km/h
                                 </span>
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${getIgStatusColor(location.igStatus)}`}>
-                                    {getIgStatusText(location.igStatus)}
+                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${location.igStatus !== null ? getIgStatusColor(location.igStatus) : 'text-gray-600 bg-gray-100'}`}>
+                                    {location.igStatus !== null ? getIgStatusText(location.igStatus) : 'N/A'}
                                 </span>
                             </div>
                         </div>
@@ -218,36 +219,36 @@ const AccordionItem: React.FC<AccordionItemProps> = ({ location, isOpen, onToggl
                                                 <Database className="h-4 w-4 text-gray-400" />
                                                 <span className="text-sm font-medium text-gray-600">Device ID:</span>
                                             </div>
-                                            <span className="text-sm font-semibold text-gray-900">{location.device.id}</span>
+                                            <span className="text-sm font-semibold text-gray-900">{location.device.id || 'N/A'}</span>
                                         </div>
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center space-x-2">
                                                 <Smartphone className="h-4 w-4 text-gray-400" />
                                                 <span className="text-sm font-medium text-gray-600">Device Name:</span>
                                             </div>
-                                            <span className="text-sm font-semibold text-gray-900">{location.device.name}</span>
+                                            <span className="text-sm font-semibold text-gray-900">{location.device.name || 'N/A'}</span>
                                         </div>
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center space-x-2">
                                                 <Database className="h-4 w-4 text-gray-400" />
                                                 <span className="text-sm font-medium text-gray-600">Device IMEI:</span>
                                             </div>
-                                            <span className="text-sm font-semibold text-gray-900">{location.device.imei}</span>
+                                            <span className="text-sm font-semibold text-gray-900">{location.device.imei || 'N/A'}</span>
                                         </div>
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center space-x-2">
                                                 <Phone className="h-4 w-4 text-gray-400" />
                                                 <span className="text-sm font-medium text-gray-600">Phone:</span>
                                             </div>
-                                            <span className="text-sm font-semibold text-gray-900">{location.device.phoneNo}</span>
+                                            <span className="text-sm font-semibold text-gray-900">{location.device.phoneNo || 'N/A'}</span>
                                         </div>
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center space-x-2">
                                                 <Mail className="h-4 w-4 text-gray-400" />
                                                 <span className="text-sm font-medium text-gray-600">Email:</span>
                                             </div>
-                                            <span className="text-sm font-semibold text-gray-900 truncate max-w-32" title={location.device.emailAddress}>
-                                                {location.device.emailAddress}
+                                            <span className="text-sm font-semibold text-gray-900 truncate max-w-32" title={location.device.emailAddress || 'N/A'}>
+                                                {location.device.emailAddress || 'N/A'}
                                             </span>
                                         </div>
                                         <div className="flex items-center justify-between">
@@ -256,7 +257,7 @@ const AccordionItem: React.FC<AccordionItemProps> = ({ location, isOpen, onToggl
                                                 <span className="text-sm font-medium text-gray-600">Device Created:</span>
                                             </div>
                                             <span className="text-sm font-semibold text-gray-900">
-                                                {formatCreatedDate(location.device.createdAt)}
+                                                {location.device.createdAt ? formatCreatedDate(location.device.createdAt) : 'N/A'}
                                             </span>
                                         </div>
                                     </div>
@@ -271,7 +272,7 @@ const AccordionItem: React.FC<AccordionItemProps> = ({ location, isOpen, onToggl
 };
 
 export const LocationDataAccordion: React.FC = () => {
-    const { filteredData, loading } = useLocationData();
+    const { locationData, loading } = useLocationData();
     const [openItems, setOpenItems] = useState<Set<number>>(new Set());
 
     const toggleAccordion = (locationId: number) => {
@@ -285,7 +286,7 @@ export const LocationDataAccordion: React.FC = () => {
     };
 
     const expandAll = () => {
-        setOpenItems(new Set(filteredData.map(location => location.id)));
+        setOpenItems(new Set(locationData.map(location => location.id)));
     };
 
     const collapseAll = () => {
@@ -301,7 +302,7 @@ export const LocationDataAccordion: React.FC = () => {
         );
     }
 
-    if (filteredData.length === 0) {
+    if (locationData.length === 0) {
         return (
             <div className="p-8 text-center text-gray-500">
                 <MapPin className="mx-auto h-12 w-12 text-gray-300 mb-2" />
@@ -317,7 +318,7 @@ export const LocationDataAccordion: React.FC = () => {
             <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center space-x-4">
                     <h2 className="text-xl font-semibold text-gray-800">Location Data Details</h2>
-                    <span className="text-sm text-gray-500">({filteredData.length} records)</span>
+                    <span className="text-sm text-gray-500">({locationData.length} records)</span>
                 </div>
                 <div className="flex space-x-2">
                     <button
@@ -337,7 +338,7 @@ export const LocationDataAccordion: React.FC = () => {
 
             {/* Accordion Items */}
             <div className="space-y-4">
-                {filteredData.map((location) => (
+                {locationData.map((location) => (
                     <AccordionItem
                         key={location.id}
                         location={location}
@@ -346,6 +347,9 @@ export const LocationDataAccordion: React.FC = () => {
                     />
                 ))}
             </div>
+
+            {/* Pagination */}
+            <Pagination />
         </div>
     );
 }; 

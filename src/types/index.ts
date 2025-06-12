@@ -43,6 +43,22 @@ export interface Filters {
   endDate: Date | null;
 }
 
+export interface PaginationInfo {
+  currentPage: number;
+  totalPages: number;
+  limit: number;
+  offset: number;
+  total: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  resultCount: number;
+}
+
+export interface PaginationParams {
+  page: number;
+  limit: number;
+}
+
 export interface ApiResponse {
   success: boolean;
   locationsData: LocationData[];
@@ -52,9 +68,5 @@ export interface ApiResponse {
     startDate: string | null;
     endDate: string | null;
   };
-  pagination: {
-    limit: number;
-    offset: number;
-    total: number;
-  };
+  pagination: PaginationInfo;
 }

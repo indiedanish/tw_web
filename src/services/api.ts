@@ -1,14 +1,22 @@
-import axios from 'axios';
-import { ApiResponse } from '../types';
+import axios from "axios";
+import { ApiResponse, PaginationParams } from "../types";
 
-const API_URL = 'http://ec2-52-66-236-101.ap-south-1.compute.amazonaws.com:3000/api/location';
+const API_URL =
+  "http://localhost:3000/api/location";
 
-export const fetchLocationData = async (): Promise<ApiResponse> => {
+export const fetchLocationData = async (
+  pagination: PaginationParams = { page: 1, limit: 10 }
+): Promise<ApiResponse> => {
   try {
-    const response = await axios.get<ApiResponse>(API_URL);
+    const response = await axios.get<ApiResponse>(API_URL, {
+      params: {
+        page: pagination.page,
+        limit: pagination.limit,
+      },
+    });
     return response.data;
   } catch (error) {
-    console.error('Error fetching location data:', error);
-    throw new Error('Failed to fetch location data. Please try again later.');
+    console.error("Error fetching location data:", error);
+    throw new Error("Failed to fetch location data. Please try again later.");
   }
 };
