@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Filter } from 'lucide-react';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
@@ -9,23 +9,19 @@ export const Filters = () => {
     devices,
     filters,
     setFilters,
-    applyFilters,
     clearFilters,
     filteredData,
     locationData
   } = useLocationData();
 
-  // Auto-apply filters whenever filter state changes
-  useEffect(() => {
-    applyFilters();
-  }, [filters, applyFilters]);
-
   const handleDeviceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value === "" ? null : e.target.value;
+    console.log('Device changed to:', value); // Debug log
     setFilters({ ...filters, imei: value });
   };
 
   const handleDateChange = (key: 'startDate' | 'endDate', date: Date | null) => {
+    console.log('Date changed:', key, date); // Debug log
     setFilters({ ...filters, [key]: date });
   };
 

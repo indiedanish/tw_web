@@ -1,19 +1,37 @@
 import axios from "axios";
 import { ApiResponse, PaginationParams } from "../types";
 
-const API_BASE_URL = "http://ec2-52-66-236-101.ap-south-1.compute.amazonaws.com:3000/api";
+// const API_BASE_URL = "http://ec2-52-66-236-101.ap-south-1.compute.amazonaws.com:3000/api";
+const API_BASE_URL = "http://localhost:3000/api";
+
 const LOCATION_API_URL = `${API_BASE_URL}/location`;
 const CONFIG_API_URL = `${API_BASE_URL}/default-config`;
 
 export const fetchLocationData = async (
-  pagination: PaginationParams = { page: 1, limit: 10 }
+  params: PaginationParams = { page: 1, limit: 10 }
 ): Promise<ApiResponse> => {
   try {
+    // Build query parameters
+    const queryParams: any = {
+      page: params.page,
+      limit: params.limit,
+    };
+
+    // Add filter parameters if they exist
+    if (params.imei) {
+      queryParams.imei = params.imei;
+    }
+
+    if (params.startDate) {
+      queryParams.startDate = params.startDate;
+    }
+
+    if (params.endDate) {
+      queryParams.endDate = params.endDate;
+    }
+
     const response = await axios.get<ApiResponse>(LOCATION_API_URL, {
-      params: {
-        page: pagination.page,
-        limit: pagination.limit,
-      },
+      params: queryParams,
     });
     return response.data;
   } catch (error) {

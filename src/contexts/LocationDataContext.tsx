@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { fetchLocationData } from '../services/api';
 import { LocationData, Device, Filters, PaginationInfo, PaginationParams } from '../types';
 
@@ -11,7 +11,7 @@ interface LocationDataContextType {
   filters: Filters;
   pagination: PaginationInfo;
   setFilters: (filters: Filters) => void;
-  applyFilters: () => void;
+  applyFilters: () => Promise<void>;
   clearFilters: () => void;
   refreshData: () => Promise<void>;
   selectedLocation: LocationData | null;
@@ -48,20 +48,40 @@ export const LocationDataProvider = ({ children }: { children: ReactNode }) => {
     endDate: null,
   });
 
-  const loadData = async (paginationParams?: PaginationParams) => {
+  const formatDateForAPI = (date: Date): string => {
+    return date.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+  };
+
+  const loadData = useCallback(async (paginationParams?: Partial<PaginationParams>, customFilters?: Filters) => {
     try {
       setLoading(true);
       setError(null);
 
-      const paginationToUse = paginationParams || {
-        page: pagination.currentPage,
-        limit: pagination.limit
+      const filtersToUse = customFilters || filters;
+      const paginationToUse: PaginationParams = {
+        page: paginationParams?.page || pagination.currentPage,
+        limit: paginationParams?.limit || pagination.limit,
       };
+
+      // Add filter parameters
+      if (filtersToUse.imei) {
+        paginationToUse.imei = filtersToUse.imei;
+      }
+
+      if (filtersToUse.startDate) {
+        paginationToUse.startDate = formatDateForAPI(filtersToUse.startDate);
+      }
+
+      if (filtersToUse.endDate) {
+        paginationToUse.endDate = formatDateForAPI(filtersToUse.endDate);
+      }
+
+      console.log('Making API request with params:', paginationToUse); // Debug log
 
       const data = await fetchLocationData(paginationToUse);
 
       setLocationData(data.locationsData);
-      setFilteredData(data.locationsData);
+      setFilteredData(data.locationsData); // Since filtering is done server-side now
       setDevices(data.devices);
       setPagination(data.pagination);
 
@@ -74,85 +94,62 @@ export const LocationDataProvider = ({ children }: { children: ReactNode }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, pagination.currentPage, pagination.limit, selectedLocation]);
 
   useEffect(() => {
     loadData();
-    // Set up a refresh interval - uncomment for production use
-    // const interval = setInterval(loadData, 60000); // Refresh every minute
-    // return () => clearInterval(interval);
   }, []);
 
-  const applyFilters = () => {
-    let filtered = [...locationData];
+  const applyFilters = useCallback(async () => {
+    console.log('applyFilters called with:', filters); // Debug log
+    // Reset to first page when applying filters
+    await loadData({ page: 1, limit: pagination.limit }, filters);
+  }, [filters, pagination.limit, loadData]);
 
-    // Filter by device IMEI
-    if (filters.imei) {
-      filtered = filtered.filter(location => location.imei === filters.imei);
-    }
-
-    // Filter by date range
-    if (filters.startDate) {
-      filtered = filtered.filter(location => {
-        const locationDate = new Date(parseInt(location.createdAt));
-        return locationDate >= filters.startDate!;
-      });
-    }
-
-    if (filters.endDate) {
-      // Set end date to the end of the selected day
-      const endDate = new Date(filters.endDate);
-      endDate.setHours(23, 59, 59, 999);
-
-      filtered = filtered.filter(location => {
-        const locationDate = new Date(parseInt(location.createdAt));
-        return locationDate <= endDate;
-      });
-    }
-
-    setFilteredData(filtered);
-
-    // Update selected location if current one is filtered out
-    if (selectedLocation && !filtered.some(l => l.id === selectedLocation.id)) {
-      setSelectedLocation(filtered.length > 0 ? filtered[0] : null);
-    }
-  };
-
-  const clearFilters = () => {
-    setFilters({
+  const clearFilters = useCallback(() => {
+    const clearedFilters: Filters = {
       imei: null,
       startDate: null,
       endDate: null,
-    });
-    setFilteredData(locationData);
-  };
+    };
+    setFilters(clearedFilters);
+    // Load data without filters
+    loadData({ page: 1, limit: pagination.limit }, clearedFilters);
+  }, [pagination.limit, loadData]);
 
-  const refreshData = async () => {
+  const refreshData = useCallback(async () => {
     await loadData();
-    applyFilters();
-  };
+  }, [loadData]);
 
-  const changePage = async (page: number) => {
+  const changePage = useCallback(async (page: number) => {
     if (page >= 1 && page <= pagination.totalPages) {
       await loadData({ page, limit: pagination.limit });
     }
-  };
+  }, [pagination.totalPages, pagination.limit, loadData]);
 
-  const changeLimit = async (limit: number) => {
+  const changeLimit = useCallback(async (limit: number) => {
     await loadData({ page: 1, limit }); // Reset to first page when changing limit
-  };
+  }, [loadData]);
 
-  const goToNextPage = async () => {
+  const goToNextPage = useCallback(async () => {
     if (pagination.hasNextPage) {
       await changePage(pagination.currentPage + 1);
     }
-  };
+  }, [pagination.hasNextPage, pagination.currentPage, changePage]);
 
-  const goToPreviousPage = async () => {
+  const goToPreviousPage = useCallback(async () => {
     if (pagination.hasPreviousPage) {
       await changePage(pagination.currentPage - 1);
     }
-  };
+  }, [pagination.hasPreviousPage, pagination.currentPage, changePage]);
+
+  // Auto-apply filters when filters change (moved from Filters component)
+  useEffect(() => {
+    if (filters.imei !== null || filters.startDate !== null || filters.endDate !== null) {
+      console.log('Filters changed, applying...', filters); // Debug log
+      applyFilters();
+    }
+  }, [filters, applyFilters]);
 
   return (
     <LocationDataContext.Provider

@@ -57,6 +57,9 @@ export interface PaginationInfo {
 export interface PaginationParams {
   page: number;
   limit: number;
+  imei?: string | null;
+  startDate?: string | null;
+  endDate?: string | null;
 }
 
 export interface ApiResponse {
