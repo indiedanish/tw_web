@@ -7,7 +7,8 @@ import { Charts } from './Charts';
 import { Map } from './Map';
 import { AnalyticsCards } from './AnalyticsCards';
 import { LocationDataAccordion } from './LocationDataAccordion';
-import { MapPin, RefreshCw, FileBarChart, BarChart3, Table, Map as MapIcon, LogOut, List } from 'lucide-react';
+import { Configs } from './Configs';
+import { MapPin, RefreshCw, FileBarChart, BarChart3, Table, Map as MapIcon, LogOut, List, Settings } from 'lucide-react';
 
 export const Dashboard = () => {
   const {
@@ -21,6 +22,7 @@ export const Dashboard = () => {
   const { logout } = useAuth();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [currentView, setCurrentView] = useState<'table' | 'charts' | 'map' | 'accordion'>('table');
+  const [currentPage, setCurrentPage] = useState<'dashboard' | 'configs'>('dashboard');
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -32,11 +34,24 @@ export const Dashboard = () => {
     logout();
   };
 
+  const handleConfigNavigation = () => {
+    setCurrentPage('configs');
+  };
+
+  const handleBackToDashboard = () => {
+    setCurrentPage('dashboard');
+  };
+
   useEffect(() => {
     if (filteredData.length > 0 && !selectedLocation) {
       setSelectedLocation(filteredData[0]);
     }
   }, [filteredData, selectedLocation, setSelectedLocation]);
+
+  // If we're on the configs page, render the Configs component
+  if (currentPage === 'configs') {
+    return <Configs onBack={handleBackToDashboard} />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
@@ -93,7 +108,14 @@ export const Dashboard = () => {
                 <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
                 Refresh
               </button>
-
+              <button
+                onClick={handleConfigNavigation}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-600 rounded-lg text-white hover:bg-gray-700 transition-colors duration-200"
+                title="Configuration"
+              >
+                <Settings className="h-4 w-4" />
+                Config
+              </button>
               <button
                 onClick={handleLogout}
                 className="flex items-center gap-2 px-4 py-2 bg-red-600 rounded-lg text-white hover:bg-red-700 transition-colors duration-200"
