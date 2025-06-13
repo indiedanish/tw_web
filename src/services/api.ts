@@ -1,8 +1,8 @@
 import axios from "axios";
 import { ApiResponse, PaginationParams } from "../types";
 
-const API_BASE_URL = "http://ec2-52-66-236-101.ap-south-1.compute.amazonaws.com:3000/api";
-// const API_BASE_URL = "http://localhost:3000/api";
+// const API_BASE_URL = "http://ec2-52-66-236-101.ap-south-1.compute.amazonaws.com:3000/api";
+const API_BASE_URL = "http://localhost:3000/api";
 
 const LOCATION_API_URL = `${API_BASE_URL}/location`;
 const CONFIG_API_URL = `${API_BASE_URL}/default-config`;

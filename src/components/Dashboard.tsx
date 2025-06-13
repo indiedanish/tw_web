@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocationData } from '../contexts/LocationDataContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useNavigate, Routes, Route } from 'react-router-dom';
 import { Filters } from './Filters';
 import { LocationTable } from './LocationTable';
 import { Charts } from './Charts';
@@ -9,8 +10,10 @@ import { AnalyticsCards } from './AnalyticsCards';
 import { LocationDataAccordion } from './LocationDataAccordion';
 import { Configs } from './Configs';
 import { MapPin, RefreshCw, FileBarChart, BarChart3, Table, Map as MapIcon, LogOut, List, Settings } from 'lucide-react';
+import { DeviceConfigs } from './DeviceConfigs';
 
-export const Dashboard = () => {
+// Separate component for the main dashboard content
+const DashboardContent = () => {
   const {
     loading,
     error,
@@ -20,9 +23,9 @@ export const Dashboard = () => {
     setSelectedLocation
   } = useLocationData();
   const { logout } = useAuth();
+  const navigate = useNavigate();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [currentView, setCurrentView] = useState<'table' | 'charts' | 'map' | 'accordion'>('table');
-  const [currentPage, setCurrentPage] = useState<'dashboard' | 'configs'>('dashboard');
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -32,14 +35,11 @@ export const Dashboard = () => {
 
   const handleLogout = () => {
     logout();
+    navigate('/login');
   };
 
   const handleConfigNavigation = () => {
-    setCurrentPage('configs');
-  };
-
-  const handleBackToDashboard = () => {
-    setCurrentPage('dashboard');
+    navigate('/configs');
   };
 
   useEffect(() => {
@@ -47,11 +47,6 @@ export const Dashboard = () => {
       setSelectedLocation(filteredData[0]);
     }
   }, [filteredData, selectedLocation, setSelectedLocation]);
-
-  // If we're on the configs page, render the Configs component
-  if (currentPage === 'configs') {
-    return <Configs onBack={handleBackToDashboard} />;
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
@@ -117,6 +112,14 @@ export const Dashboard = () => {
                 Config
               </button>
               <button
+                onClick={() => navigate('/device-configs')}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-600 rounded-lg text-white hover:bg-gray-700 transition-colors duration-200"
+                title="Device Configurations"
+              >
+                <Settings className="h-4 w-4" />
+                Device Configs
+              </button>
+              <button
                 onClick={handleLogout}
                 className="flex items-center gap-2 px-4 py-2 bg-red-600 rounded-lg text-white hover:bg-red-700 transition-colors duration-200"
                 title="Logout"
@@ -139,7 +142,6 @@ export const Dashboard = () => {
           </div>
         ) : null}
 
-        {/* Analytics Cards */}
         <AnalyticsCards />
 
         <div className="space-y-8">
@@ -167,5 +169,16 @@ export const Dashboard = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+// Main Dashboard component with routing
+export const Dashboard = () => {
+  return (
+    <Routes>
+      <Route path="/" element={<DashboardContent />} />
+      <Route path="/configs" element={<Configs />} />
+      <Route path="/device-configs" element={<DeviceConfigs />} />
+    </Routes>
   );
 };

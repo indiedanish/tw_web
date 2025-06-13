@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Settings, Database, Globe, Shield, Bell, Users, Palette, Save, RotateCcw, AlertCircle, CheckCircle } from 'lucide-react';
 import { fetchDefaultConfig, updateDefaultConfig, DefaultConfig, ConfigUpdateRequest } from '../services/api';
+import { useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-interface ConfigsProps {
-    onBack: () => void;
-}
-
-export const Configs: React.FC<ConfigsProps> = ({ onBack }) => {
+export const Configs: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
     const [config, setConfig] = useState<DefaultConfig | null>(null);
     const [formData, setFormData] = useState<Partial<ConfigUpdateRequest>>({});
+    const navigate = useNavigate();
 
     useEffect(() => {
         loadConfiguration();
@@ -97,6 +96,10 @@ export const Configs: React.FC<ConfigsProps> = ({ onBack }) => {
         }
     };
 
+    const handleBack = () => {
+        navigate('/');
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center">
@@ -110,31 +113,24 @@ export const Configs: React.FC<ConfigsProps> = ({ onBack }) => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-            <header className="bg-white border-b border-gray-200 shadow-sm">
+            <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
                 <div className="container mx-auto px-4 py-4">
-                    <div className="flex items-center gap-4">
-                        <button
-                            onClick={onBack}
-                            className="flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors duration-200"
-                        >
-                            <ArrowLeft className="h-4 w-4" />
-                            Back to Dashboard
-                        </button>
-                        <div className="border-l border-gray-300 h-6 mx-2"></div>
+                    <div className="flex items-center justify-between">
                         <div className="flex items-center">
-                            <div className="bg-gradient-to-r from-gray-600 to-gray-700 p-2 rounded-lg mr-3">
-                                <Settings className="h-6 w-6 text-white" />
-                            </div>
-                            <div>
-                                <h1 className="text-2xl font-bold text-gray-800">Default Configuration</h1>
-                                <p className="text-gray-600">Manage tracking device settings and timers</p>
-                            </div>
+                            <button
+                                onClick={handleBack}
+                                className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors duration-200 mr-4"
+                            >
+                                <ArrowLeft className="h-4 w-4" />
+                                Back to Dashboard
+                            </button>
+                            <h1 className="text-2xl font-bold text-gray-800">Configuration</h1>
                         </div>
                     </div>
                 </div>
             </header>
 
-            <div className="container mx-auto px-4 py-8">
+            <div className="container mx-auto px-4 pt-24 pb-8">
                 {error && (
                     <div className="mb-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md flex items-center gap-2">
                         <AlertCircle className="h-4 w-4" />
