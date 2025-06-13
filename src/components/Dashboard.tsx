@@ -109,7 +109,7 @@ const DashboardContent = () => {
                 title="Configuration"
               >
                 <Settings className="h-4 w-4" />
-                Config
+                Default Config
               </button>
               <button
                 onClick={() => navigate('/device-configs')}
