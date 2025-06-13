@@ -106,7 +106,7 @@ const DashboardContent = () => {
               <button
                 onClick={handleConfigNavigation}
                 className="flex items-center gap-2 px-4 py-2 bg-gray-600 rounded-lg text-white hover:bg-gray-700 transition-colors duration-200"
-                title="Configuration"
+                title="Default Configuration"
               >
                 <Settings className="h-4 w-4" />
                 Default Config
